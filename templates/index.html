@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>人生模拟器</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1>欢迎来到人生模拟器</h1>
+    <p>点击下方按钮开始游戏：</p>
+    <form action="{{ url_for('start_game') }}" method="post">
+        <button type="submit">开始游戏</button>
+    </form>
+</body>
+</html>

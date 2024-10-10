@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>人生模拟器</title>
+</head>
+<body>
+    <h1>年龄：{{ age }}岁</h1>
+    <h2>属性：</h2>
+    <ul>
+        {% for key, value in attributes.items() %}
+            <li>{{ key }}：{{ value }}</li>
+        {% endfor %}
+    </ul>
+
+    <h2>NPC关系：</h2>
+    <ul>
+        {% for npc in npcs %}
+            <li>{{ npc.name }}（{{ npc.relation }}）：好感度 {{ npc.likability }}</li>
+        {% endfor %}
+    </ul>
+
+    <h2>事件：</h2>
+    <p>{{ event.description }}</p>
+
+    <form action="{{ url_for('game') }}" method="post">
+        {% for option in event.options %}
+            <input type="radio" id="choice{{ loop.index0 }}" name="choice" value="{{ loop.index0 }}" required>
+            <label for="choice{{ loop.index0 }}">{{ option.text }}</label><br>
+        {% endfor %}
+        <br>
+        <input type="submit" value="选择">
+    </form>
+</body>
+</html>

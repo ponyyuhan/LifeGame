@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>游戏结果</title>
+</head>
+<body>
+    <h1>游戏结束</h1>
+    <h2>最终属性：</h2>
+    <ul>
+        {% for key, value in attributes.items() %}
+            <li>{{ key }}：{{ value }}</li>
+        {% endfor %}
+    </ul>
+
+    <h2>重大事件：</h2>
+    <ul>
+        {% for event in major_events %}
+            <li>{{ event }}</li>
+        {% else %}
+            <li>无</li>
+        {% endfor %}
+    </ul>
+
+    <h2>人生历程：</h2>
+    <ul>
+        {% for record in history %}
+            <li>年龄 {{ record.age }} 岁：{{ record.event }} - 选择了 "{{ record.choice }}"</li>
+        {% endfor %}
+    </ul>
+
+    <a href="{{ url_for('index') }}">重新开始</a>
+</body>
+</html>

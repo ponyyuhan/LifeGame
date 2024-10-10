@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>开始游戏</title>
+</head>
+<body>
+    <h1>欢迎来到人生模拟器</h1>
+    {% if error %}
+        <p style="color:red;">{{ error }}</p>
+    {% endif %}
+    <form action="{{ url_for('start_game') }}" method="post">
+        <label for="gender">选择性别：</label><br>
+        <input type="radio" id="male" name="gender" value="男" required>
+        <label for="male">男</label><br>
+        <input type="radio" id="female" name="gender" value="女">
+        <label for="female">女</label><br><br>
+
+        <label for="family">选择出生家庭：</label><br>
+        <input type="radio" id="ordinary" name="family" value="ordinary" required>
+        <label for="ordinary">普通家庭</label><br>
+        <input type="radio" id="wealthy" name="family" value="wealthy">
+        <label for="wealthy">富裕家庭</label><br>
+        <input type="radio" id="rural" name="family" value="rural">
+        <label for="rural">农村家庭</label><br>
+        <input type="radio" id="scholar" name="family" value="scholar">
+        <label for="scholar">书香门第</label><br>
+        <input type="radio" id="artist" name="family" value="artist">
+        <label for="artist">艺术家庭</label><br><br>
+
+        <h2>属性分配（总计500点）</h2>
+        {% for key, label in attributes.items() %}
+            <label for="{{ key }}">{{ label }}：</label>
+            <input type="number" id="{{ key }}" name="{{ key }}" min="0" max="100" value="50" required><br>
+        {% endfor %}
+
+        <br>
+        <input type="submit" value="开始游戏">
+    </form>
+</body>
+</html>
