@@ -1,15 +1,15 @@
 import os
 from flask import Flask, render_template, request, session, redirect, url_for
-import os
-from flask import Flask, render_template, request, session, redirect, url_for
 from openai import OpenAI
 import random
 
 app = Flask(__name__)
 app.secret_key = 'your-secret-key'  # 为了使用session，需要设置secret_key
 
-# 设置OpenAI API密钥
-client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+# 设置OpenAI API密钥。如果环境变量未提供，则不初始化客户端，改为在
+# 生成事件时使用预设的回退事件。
+openai_api_key = os.getenv('OPENAI_API_KEY')
+client = OpenAI(api_key=openai_api_key) if openai_api_key else None
 
 # 属性键的映射
 ATTRIBUTE_KEYS = {
@@ -221,38 +221,40 @@ def generate_event():
 }}
     """
 
-    # 调用OpenAI API
-    try:
-        completion = client.chat.completions.create(
-            model="gpt-4o-mini",  # 使用您有权限的模型
-            messages=[
-                {"role": "system", "content": "You are a helpful assistant."},
-                {"role": "user", "content": prompt}
-            ],
-            max_tokens=500,
-            temperature=0.7
-        )
+    # 调用OpenAI API，如果客户端不可用则直接使用回退事件
+    if client:
+        try:
+            completion = client.chat.completions.create(
+                model="gpt-4o-mini",  # 使用您有权限的模型
+                messages=[
+                    {"role": "system", "content": "You are a helpful assistant."},
+                    {"role": "user", "content": prompt}
+                ],
+                max_tokens=500,
+                temperature=0.7
+            )
 
-        # 获取返回的消息内容
-        message = completion.choices[0].message.content
+            # 获取返回的消息内容
+            message = completion.choices[0].message.content
 
-        print("AI Response:", message)
+            print("AI Response:", message)
 
-        # 解析返回的JSON
-        import json
-        event = json.loads(message)
-        return event
-    except Exception as e:
-        print(f"Error calling OpenAI API: {e}")
-        # 如果出现错误，返回一个预设的事件
-        return {
-            "description": "你遇到了一个无法描述的奇怪事件。",
-            "options": [
-                {"text": "选择一，随遇而安。", "effects": {"健康": +0}},
-                {"text": "选择二，奋力抵抗。", "effects": {"健康": -5}},
-                {"text": "选择三，转身逃跑。", "effects": {"健康": -2}}
-            ]
-        }
+            # 解析返回的JSON
+            import json
+            event = json.loads(message)
+            return event
+        except Exception as e:
+            print(f"Error calling OpenAI API: {e}")
+
+    # 如果出现错误或未配置客户端，返回一个预设的事件
+    return {
+        "description": "你遇到了一个无法描述的奇怪事件。",
+        "options": [
+            {"text": "选择一，随遇而安。", "effects": {"健康": 0}},
+            {"text": "选择二，奋力抵抗。", "effects": {"健康": -5}},
+            {"text": "选择三，转身逃跑。", "effects": {"健康": -2}}
+        ]
+    }
 
 def update_attributes(effects):
     for key, value in effects.items():
